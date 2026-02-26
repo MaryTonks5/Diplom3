@@ -9,17 +9,17 @@ public class MainPage extends BasePage {
 
     private static final String URL = "https://stellarburgers.education-services.ru/";
 
-    // Локаторы
-    private final By LOGIN_BUTTON = By.xpath("//button[text()='Войти в аккаунт']");
-    private final By PLACE_ORDER_BUTTON = By.xpath("//button[text()='Оформить заказ']");
+    // Локаторы - добавили static final
+    private static final By LOGIN_BUTTON = By.xpath("//button[text()='Войти в аккаунт']");
+    private static final By PLACE_ORDER_BUTTON = By.xpath("//button[text()='Оформить заказ']");
 
     // Локаторы для табов конструктора
-    private final By BUNS_TAB = By.xpath("//span[text()='Булки']/parent::div");
-    private final By SAUCES_TAB = By.xpath("//span[text()='Соусы']/parent::div");
-    private final By FILLINGS_TAB = By.xpath("//span[text()='Начинки']/parent::div");
+    private static final By BUNS_TAB = By.xpath("//span[text()='Булки']/parent::div");
+    private static final By SAUCES_TAB = By.xpath("//span[text()='Соусы']/parent::div");
+    private static final By FILLINGS_TAB = By.xpath("//span[text()='Начинки']/parent::div");
 
     // Активный таб
-    private final By ACTIVE_TAB = By.xpath("//div[@class='tab_tab__1SPyG tab_tab_type_current__2BEPc']");
+    private static final By ACTIVE_TAB = By.xpath("//div[@class='tab_tab__1SPyG tab_tab_type_current__2BEPc']");
 
     public MainPage(WebDriver driver) {
         super(driver);
@@ -36,11 +36,20 @@ public class MainPage extends BasePage {
         wait.until(ExpectedConditions.elementToBeClickable(LOGIN_BUTTON)).click();
     }
 
-    @Step("Проверить отображение кнопки 'Оформить заказ'")
-    public boolean isPlaceOrderButtonDisplayed() {
+    @Step("Ожидать отображение кнопки 'Оформить заказ'")
+    public boolean waitForPlaceOrderButton() {
         try {
             return wait.until(ExpectedConditions.visibilityOfElementLocated(PLACE_ORDER_BUTTON))
                     .isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Step("Проверить отображение кнопки 'Оформить заказ'")
+    public boolean isPlaceOrderButtonDisplayed() {
+        try {
+            return driver.findElement(PLACE_ORDER_BUTTON).isDisplayed();
         } catch (Exception e) {
             return false;
         }

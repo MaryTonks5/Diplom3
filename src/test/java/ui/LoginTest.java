@@ -4,12 +4,7 @@ import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import ui.pages.*;
-
-import java.time.Duration;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
@@ -20,33 +15,22 @@ public class LoginTest extends BaseUITest {
     private String testEmail;
     private String testPassword;
     private String testName;
-    private static final int WAIT_TIMEOUT = 10;
 
     @Before
     public void setUp() {
         super.setUp();
 
         testEmail = generateRandomEmail();
-        testPassword = "1234567"; // Используем пароль 7 символов для успешной регистрации
+        testPassword = "1234567";
         testName = generateRandomName();
 
-        // Регистрируем пользователя через UI с правильными ожиданиями
+        // Регистрируем пользователя через API или UI
         RegisterPage registerPage = new RegisterPage(driver);
         registerPage.open();
-
-        // Добавляем логирование для отладки
-        System.out.println("Регистрация пользователя:");
-        System.out.println("Name: " + testName);
-        System.out.println("Email: " + testEmail);
-        System.out.println("Password: " + testPassword);
-
         registerPage.register(testName, testEmail, testPassword);
 
         // Ждем результат регистрации
         boolean registrationSuccess = registerPage.waitForSuccessfulRegistration();
-
-        System.out.println("Регистрация успешна: " + registrationSuccess);
-        System.out.println("Текущий URL после регистрации: " + driver.getCurrentUrl());
 
         // Если регистрация не удалась - пропускаем тесты
         assumeTrue("Не удалось зарегистрировать пользователя. Тесты логина пропускаются.",
@@ -64,13 +48,9 @@ public class LoginTest extends BaseUITest {
         mainPage.clickLoginButton();
         loginPage.login(testEmail, testPassword);
 
-        // Ждем появления кнопки "Оформить заказ"
-        boolean isOrderButtonDisplayed = new WebDriverWait(driver, Duration.ofSeconds(WAIT_TIMEOUT))
-                .until(ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("//button[text()='Оформить заказ']"))
-                ).isDisplayed();
-
-        assertTrue("Пользователь должен быть авторизован", isOrderButtonDisplayed);
+        // Используем метод из Page Object вместо прямого WebDriverWait
+        assertTrue("Пользователь должен быть авторизован",
+                mainPage.waitForPlaceOrderButton());
     }
 
     @Test
@@ -85,13 +65,8 @@ public class LoginTest extends BaseUITest {
         headerPage.clickPersonalAccount();
         loginPage.login(testEmail, testPassword);
 
-        // Ждем появления кнопки "Оформить заказ"
-        boolean isOrderButtonDisplayed = new WebDriverWait(driver, Duration.ofSeconds(WAIT_TIMEOUT))
-                .until(ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("//button[text()='Оформить заказ']"))
-                ).isDisplayed();
-
-        assertTrue("Пользователь должен быть авторизован", isOrderButtonDisplayed);
+        assertTrue("Пользователь должен быть авторизован",
+                mainPage.waitForPlaceOrderButton());
     }
 
     @Test
@@ -100,18 +75,15 @@ public class LoginTest extends BaseUITest {
     public void testLoginViaRegisterForm() {
         RegisterPage registerPage = new RegisterPage(driver);
         LoginPage loginPage = new LoginPage(driver);
-        MainPage mainPage = new MainPage(driver);
 
         registerPage.open();
         registerPage.clickLoginLink();
+        loginPage.waitForPageLoad(); // Ждем загрузки страницы логина
         loginPage.login(testEmail, testPassword);
 
-        boolean isOrderButtonDisplayed = new WebDriverWait(driver, Duration.ofSeconds(WAIT_TIMEOUT))
-                .until(ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("//button[text()='Оформить заказ']"))
-                ).isDisplayed();
-
-        assertTrue("Пользователь должен быть авторизован", isOrderButtonDisplayed);
+        MainPage mainPage = new MainPage(driver);
+        assertTrue("Пользователь должен быть авторизован",
+                mainPage.waitForPlaceOrderButton());
     }
 
     @Test
@@ -120,17 +92,14 @@ public class LoginTest extends BaseUITest {
     public void testLoginViaForgotPasswordForm() {
         ForgotPasswordPage forgotPasswordPage = new ForgotPasswordPage(driver);
         LoginPage loginPage = new LoginPage(driver);
-        MainPage mainPage = new MainPage(driver);
 
         forgotPasswordPage.open();
         forgotPasswordPage.clickLoginLink();
+        loginPage.waitForPageLoad(); // Ждем загрузки страницы логина
         loginPage.login(testEmail, testPassword);
 
-        boolean isOrderButtonDisplayed = new WebDriverWait(driver, Duration.ofSeconds(WAIT_TIMEOUT))
-                .until(ExpectedConditions.visibilityOfElementLocated(
-                        By.xpath("//button[text()='Оформить заказ']"))
-                ).isDisplayed();
-
-        assertTrue("Пользователь должен быть авторизован", isOrderButtonDisplayed);
+        MainPage mainPage = new MainPage(driver);
+        assertTrue("Пользователь должен быть авторизован",
+                mainPage.waitForPlaceOrderButton());
     }
 }

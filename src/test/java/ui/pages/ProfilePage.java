@@ -7,8 +7,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class ProfilePage extends BasePage {
 
-    // Локаторы
-    private final By PROFILE_INFO = By.xpath("//p[text()='В этом разделе вы можете изменить свои персональные данные']");
+    // Локаторы - добавили static final
+    private static final By PROFILE_INFO = By.xpath("//p[text()='В этом разделе вы можете изменить свои персональные данные']");
 
     public ProfilePage(WebDriver driver) {
         super(driver);

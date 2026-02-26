@@ -3,17 +3,18 @@ package ui.pages;
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class LoginPage extends BasePage {
 
     private static final String URL = "https://stellarburgers.education-services.ru/login";
 
-    // Локаторы
-    private final By EMAIL_INPUT = By.xpath("//label[text()='Email']/following-sibling::input");
-    private final By PASSWORD_INPUT = By.xpath("//input[@type='password']");
-    private final By LOGIN_BUTTON = By.xpath("//button[text()='Войти']");
-    private final By REGISTER_LINK = By.xpath("//a[text()='Зарегистрироваться']");
-    private final By FORGOT_PASSWORD_LINK = By.xpath("//a[text()='Восстановить пароль']");
+    // Локаторы - добавили static final
+    private static final By EMAIL_INPUT = By.xpath("//label[text()='Email']/following-sibling::input");
+    private static final By PASSWORD_INPUT = By.xpath("//input[@type='password']");
+    private static final By LOGIN_BUTTON = By.xpath("//button[text()='Войти']");
+    private static final By REGISTER_LINK = By.xpath("//a[text()='Зарегистрироваться']");
+    private static final By FORGOT_PASSWORD_LINK = By.xpath("//a[text()='Восстановить пароль']");
 
     public LoginPage(WebDriver driver) {
         super(driver);
@@ -26,17 +27,17 @@ public class LoginPage extends BasePage {
 
     @Step("Ввести email: {email}")
     public void setEmail(String email) {
-        driver.findElement(EMAIL_INPUT).sendKeys(email);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(EMAIL_INPUT)).sendKeys(email);
     }
 
     @Step("Ввести пароль")
     public void setPassword(String password) {
-        driver.findElement(PASSWORD_INPUT).sendKeys(password);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(PASSWORD_INPUT)).sendKeys(password);
     }
 
     @Step("Клик по кнопке 'Войти'")
     public void clickLoginButton() {
-        driver.findElement(LOGIN_BUTTON).click();
+        wait.until(ExpectedConditions.elementToBeClickable(LOGIN_BUTTON)).click();
     }
 
     @Step("Выполнить вход")
@@ -48,11 +49,16 @@ public class LoginPage extends BasePage {
 
     @Step("Клик по ссылке 'Зарегистрироваться'")
     public void clickRegisterLink() {
-        driver.findElement(REGISTER_LINK).click();
+        wait.until(ExpectedConditions.elementToBeClickable(REGISTER_LINK)).click();
     }
 
     @Step("Клик по ссылке 'Восстановить пароль'")
     public void clickForgotPasswordLink() {
-        driver.findElement(FORGOT_PASSWORD_LINK).click();
+        wait.until(ExpectedConditions.elementToBeClickable(FORGOT_PASSWORD_LINK)).click();
+    }
+
+    @Step("Ожидать загрузку страницы логина")
+    public void waitForPageLoad() {
+        wait.until(ExpectedConditions.visibilityOfElementLocated(LOGIN_BUTTON));
     }
 }

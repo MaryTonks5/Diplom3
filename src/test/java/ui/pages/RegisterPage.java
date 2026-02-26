@@ -10,16 +10,14 @@ public class RegisterPage extends BasePage {
 
     private static final String URL = "https://stellarburgers.education-services.ru/register";
 
-    // Локаторы
-    private final By NAME_INPUT = By.xpath("//label[text()='Имя']/following-sibling::input");
-    private final By EMAIL_INPUT = By.xpath("//label[text()='Email']/following-sibling::input");
-    private final By PASSWORD_INPUT = By.xpath("//input[@type='password']");
-    private final By REGISTER_BUTTON = By.xpath("//button[text()='Зарегистрироваться']");
-    private final By LOGIN_LINK = By.xpath("//a[text()='Войти']");
-    private final By ERROR_MESSAGE = By.xpath("//p[text()='Некорректный пароль']");
-
-    // Локатор для успешной регистрации (появление формы логина)
-    private final By LOGIN_FORM_BUTTON = By.xpath("//button[text()='Войти']");
+    // Локаторы - добавили static final
+    private static final By NAME_INPUT = By.xpath("//label[text()='Имя']/following-sibling::input");
+    private static final By EMAIL_INPUT = By.xpath("//label[text()='Email']/following-sibling::input");
+    private static final By PASSWORD_INPUT = By.xpath("//input[@type='password']");
+    private static final By REGISTER_BUTTON = By.xpath("//button[text()='Зарегистрироваться']");
+    private static final By LOGIN_LINK = By.xpath("//a[text()='Войти']");
+    private static final By ERROR_MESSAGE = By.xpath("//p[text()='Некорректный пароль']");
+    private static final By LOGIN_FORM_BUTTON = By.xpath("//button[text()='Войти']");
 
     public RegisterPage(WebDriver driver) {
         super(driver);
@@ -28,7 +26,6 @@ public class RegisterPage extends BasePage {
     @Step("Открыть страницу регистрации")
     public void open() {
         driver.get(URL);
-        // Ждем загрузки страницы
         wait.until(ExpectedConditions.visibilityOfElementLocated(REGISTER_BUTTON));
     }
 
@@ -81,16 +78,12 @@ public class RegisterPage extends BasePage {
     @Step("Ожидать успешную регистрацию (редирект на страницу логина)")
     public boolean waitForSuccessfulRegistration() {
         try {
-            // Ждем либо редирект на login в URL
             boolean urlContainsLogin = wait.until(
                     ExpectedConditions.urlContains("login")
             );
-
-            // ИЛИ ждем появление кнопки входа на странице
             boolean loginButtonVisible = wait.until(
                     ExpectedConditions.visibilityOfElementLocated(LOGIN_FORM_BUTTON)
             ).isDisplayed();
-
             return urlContainsLogin || loginButtonVisible;
         } catch (Exception e) {
             return false;

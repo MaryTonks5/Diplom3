@@ -3,13 +3,14 @@ package ui.pages;
 import io.qameta.allure.Step;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class ForgotPasswordPage extends BasePage {
 
     private static final String URL = "https://stellarburgers.education-services.ru/forgot-password";
 
-    // Локаторы
-    private final By LOGIN_LINK = By.xpath("//a[text()='Войти']");
+    // Локаторы - добавили static final
+    private static final By LOGIN_LINK = By.xpath("//a[text()='Войти']");
 
     public ForgotPasswordPage(WebDriver driver) {
         super(driver);
@@ -22,6 +23,6 @@ public class ForgotPasswordPage extends BasePage {
 
     @Step("Клик по ссылке 'Войти'")
     public void clickLoginLink() {
-        driver.findElement(LOGIN_LINK).click();
+        wait.until(ExpectedConditions.elementToBeClickable(LOGIN_LINK)).click();
     }
 }
