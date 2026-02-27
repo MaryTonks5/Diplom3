@@ -1,13 +1,17 @@
 package ui;
 
+import api.clients.UserClient;
+import api.models.User;
+import api.models.UserCredentials;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.ValidatableResponse;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import ui.pages.*;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
 
 @DisplayName("Тесты входа в систему")
 public class LoginTest extends BaseUITest {
@@ -15,26 +19,42 @@ public class LoginTest extends BaseUITest {
     private String testEmail;
     private String testPassword;
     private String testName;
+    private UserClient userClient;
+    private User user;
+    private String accessToken;
 
     @Before
     public void setUp() {
         super.setUp();
 
+        // Инициализируем API клиент
+        userClient = new UserClient();
+
+        // Генерируем данные пользователя
         testEmail = generateRandomEmail();
         testPassword = "1234567";
         testName = generateRandomName();
 
-        // Регистрируем пользователя через API или UI
-        RegisterPage registerPage = new RegisterPage(driver);
-        registerPage.open();
-        registerPage.register(testName, testEmail, testPassword);
+        // Создаем пользователя через API
+        user = new User(testEmail, testPassword, testName);
+        ValidatableResponse createResponse = userClient.createUser(user);
+        accessToken = createResponse.extract().path("accessToken");
 
-        // Ждем результат регистрации
-        boolean registrationSuccess = registerPage.waitForSuccessfulRegistration();
+        // Если токен не пришел при создании, логинимся
+        if (accessToken == null) {
+            UserCredentials credentials = UserCredentials.fromUser(user);
+            ValidatableResponse loginResponse = userClient.loginUser(credentials);
+            accessToken = loginResponse.extract().path("accessToken");
+        }
+    }
 
-        // Если регистрация не удалась - пропускаем тесты
-        assumeTrue("Не удалось зарегистрировать пользователя. Тесты логина пропускаются.",
-                registrationSuccess);
+    @After
+    public void tearDown() {
+        // Удаляем пользователя после теста
+        if (accessToken != null && userClient != null) {
+            userClient.deleteUser(accessToken);
+        }
+        super.tearDown();
     }
 
     @Test
@@ -48,7 +68,6 @@ public class LoginTest extends BaseUITest {
         mainPage.clickLoginButton();
         loginPage.login(testEmail, testPassword);
 
-        // Используем метод из Page Object вместо прямого WebDriverWait
         assertTrue("Пользователь должен быть авторизован",
                 mainPage.waitForPlaceOrderButton());
     }
@@ -78,7 +97,7 @@ public class LoginTest extends BaseUITest {
 
         registerPage.open();
         registerPage.clickLoginLink();
-        loginPage.waitForPageLoad(); // Ждем загрузки страницы логина
+        loginPage.waitForPageLoad();
         loginPage.login(testEmail, testPassword);
 
         MainPage mainPage = new MainPage(driver);
@@ -95,7 +114,7 @@ public class LoginTest extends BaseUITest {
 
         forgotPasswordPage.open();
         forgotPasswordPage.clickLoginLink();
-        loginPage.waitForPageLoad(); // Ждем загрузки страницы логина
+        loginPage.waitForPageLoad();
         loginPage.login(testEmail, testPassword);
 
         MainPage mainPage = new MainPage(driver);

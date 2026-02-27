@@ -9,7 +9,7 @@ public class LoginPage extends BasePage {
 
     private static final String URL = "https://stellarburgers.education-services.ru/login";
 
-    // Локаторы - добавили static final
+    // Локаторы
     private static final By EMAIL_INPUT = By.xpath("//label[text()='Email']/following-sibling::input");
     private static final By PASSWORD_INPUT = By.xpath("//input[@type='password']");
     private static final By LOGIN_BUTTON = By.xpath("//button[text()='Войти']");
@@ -58,7 +58,12 @@ public class LoginPage extends BasePage {
     }
 
     @Step("Ожидать загрузку страницы логина")
-    public void waitForPageLoad() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(LOGIN_BUTTON));
+    public boolean waitForPageLoad() {
+        try {
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(LOGIN_BUTTON))
+                    .isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
